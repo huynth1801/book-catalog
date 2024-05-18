@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { db, validate } from '../Firebase/firebase.js';
-import { collection, addDoc, getFirestore } from 'firebase/firestore';
+import { ref, set, get, child } from 'firebase/database';
 import { v4 as uuidv4 } from 'uuid';
 
 // function to add sample books data to firebase
@@ -18,7 +18,6 @@ const addBooksToFirestore = async (req, res) => {
 
   const addedBooks = [];
 
-  const booksCollection = collection(db, 'books');
   for (const book of books) {
     if (!validate(book)) {
       console.log(`Invalid book data: ${JSON.stringify(book)}`);
@@ -28,10 +27,17 @@ const addBooksToFirestore = async (req, res) => {
 
     const bookWithId = { ...book, id: uuidv4() };
 
+    // Check if the book already exists in the Realtime Database
+    const bookRef = ref(db, 'books/' + bookWithId.id);
     try {
-      await addDoc(booksCollection, bookWithId);
-      console.log(`Added book: ${bookWithId.name}`);
-      addedBooks.push(bookWithId);
+      const snapshot = await get(child(ref(db), 'books/' + book.name));
+      if (!snapshot.exists()) {
+        await set(bookRef, bookWithId);
+        console.log(`Added book: ${bookWithId.name}`);
+        addedBooks.push(bookWithId);
+      } else {
+        console.log(`Book already exists: ${book.name}`);
+      }
     } catch (error) {
       console.error('Error adding book:', error);
       return res.status(500).json({ error: 'Failed to add book' });
