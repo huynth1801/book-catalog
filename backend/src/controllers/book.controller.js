@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { db, validate } from '../Firebase/firebase.js';
-import { ref, set, get, query, orderByChild, equalTo } from 'firebase/database';
+import { ref, set, get, query, orderByChild, equalTo, push } from 'firebase/database';
 import { v4 as uuidv4 } from 'uuid';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -77,4 +77,52 @@ const getAllBooks = async (req, res) => {
   }
 };
 
-export default { addBooksToFirestore, getAllBooks };
+const addNewBook = async (req, res) => {
+  try {
+    const { name, authors, publicationYear, rating, ISBN } = req.body;
+
+    if (!name || !authors || authors.length === 0) {
+      return res.status(400).json({ error: 'Name and at least one author are required' });
+    }
+
+    if (name.length > 1000) {
+      return res.status(400).json({ error: 'Name should not be longer than 1000 characters' });
+    }
+
+    if (publicationYear && (publicationYear < 1800 || isNaN(publicationYear))) {
+      return res.status(400).json({ error: 'Publication year should be greater than 1800' });
+    }
+
+    if (rating && (rating < 0 || rating > 10 || !Number.isInteger(rating))) {
+      return res.status(400).json({ error: 'Rating should be an integer value from 0 to 10' });
+    }
+
+    // Check if the book already exists by name
+    const booksRef = ref(db, 'books');
+    const bookQuery = query(booksRef, orderByChild('name'), equalTo(name));
+    const snapshot = await get(bookQuery);
+
+    if (!snapshot.exists()) {
+      // Book does not exist, proceed to add
+      const newBookId = uuidv4();
+      await set(ref(db, `books/${newBookId}`), {
+        name: name,
+        authors: authors,
+        publicationYear: publicationYear,
+        rating: rating || 0,
+        ISBN: ISBN || null
+      });
+      
+      res.status(201).json({ message: 'New book added successfully', id: newBookId });
+    } else {
+      // Book already exists
+      res.status(400).json({ error: 'A book with the same name already exists' });
+    }
+  } catch (err) {
+    console.error('Error adding new book:', err);
+    res.status(500).json({ error: 'Failed to add a new book' });
+  }
+};
+
+
+export default { addBooksToFirestore, getAllBooks, addNewBook };
