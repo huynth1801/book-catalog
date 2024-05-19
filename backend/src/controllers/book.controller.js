@@ -46,4 +46,24 @@ const addBooksToFirestore = async (req, res) => {
   res.status(200).json({ message: 'Books added successfully', books: addedBooks });
 };
 
-export default { addBooksToFirestore };
+// Function to get all books
+const getAllBooks = async(req, res) => {
+  const booksRef = ref(db, 'books')
+  try {
+    const snapshot = await get(booksRef);
+    if(snapshot.exists()) {
+      const books = [];
+      snapshot.forEach((item) => {
+        books.push(item.val())
+      })
+      res.status(200).json({books})
+    } else {
+      res.status(404).json({message: 'No books found'})
+    }
+  } catch(err) {
+    console.log('Errors fetching data', err);
+    res.status(500).json({error: 'Failed to fetch books'})
+  }
+}
+
+export default { addBooksToFirestore, getAllBooks };
