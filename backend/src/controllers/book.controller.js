@@ -1,19 +1,26 @@
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { db, validate } from '../Firebase/firebase.js';
-import { ref, set, get, child } from 'firebase/database';
+import { ref, set, get, query, orderByChild, equalTo } from 'firebase/database';
 import { v4 as uuidv4 } from 'uuid';
 
-// function to add sample books data to firebase
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const booksFilePath = path.join(__dirname, '../Firebase/books.json');
+
+// Function to add sample data to Firebase Realtime Database
 const addBooksToFirestore = async (req, res) => {
-  // Read books data from JSON file
   let books;
   try {
     books = JSON.parse(
-      fs.readFileSync('/Users/nguyenthaihuuhuy/book-catalog/backend/src/Firebase/books.json', 'utf-8')
+      fs.readFileSync(booksFilePath, 'utf-8')
     );
     console.log(books);
   } catch (err) {
-    throw err;
+    console.error('Error reading books file:', err);
+    return res.status(500).json({ error: 'Failed to read books file' });
   }
 
   const addedBooks = [];
@@ -25,14 +32,17 @@ const addBooksToFirestore = async (req, res) => {
     }
     book.rating = book.rating ? book.rating : 0;
 
-    const bookWithId = { ...book, id: uuidv4() };
-
-    // Check if the book already exists in the Realtime Database
-    const bookRef = ref(db, 'books/' + bookWithId.id);
     try {
-      const snapshot = await get(child(ref(db), 'books/' + book.name));
+      // Check existing of book in realtime database
+      const booksRef = ref(db, 'books');
+      const bookQuery = query(booksRef, orderByChild('name'), equalTo(book.name));
+      const snapshot = await get(bookQuery);
+
       if (!snapshot.exists()) {
-        await set(bookRef, bookWithId);
+        // Create unique id for book
+        const bookWithId = { ...book, id: uuidv4() };
+
+        await set(ref(db, 'books/' + bookWithId.id), bookWithId);
         console.log(`Added book: ${bookWithId.name}`);
         addedBooks.push(bookWithId);
       } else {
@@ -43,27 +53,28 @@ const addBooksToFirestore = async (req, res) => {
       return res.status(500).json({ error: 'Failed to add book' });
     }
   }
+
   res.status(200).json({ message: 'Books added successfully', books: addedBooks });
 };
 
-// Function to get all books
-const getAllBooks = async(req, res) => {
-  const booksRef = ref(db, 'books')
+// Function to get all book
+const getAllBooks = async (req, res) => {
+  const booksRef = ref(db, 'books');
   try {
     const snapshot = await get(booksRef);
-    if(snapshot.exists()) {
+    if (snapshot.exists()) {
       const books = [];
       snapshot.forEach((item) => {
-        books.push(item.val())
-      })
-      res.status(200).json({books})
+        books.push(item.val());
+      });
+      res.status(200).json({ books });
     } else {
-      res.status(404).json({message: 'No books found'})
+      res.status(404).json({ message: 'No books found' });
     }
-  } catch(err) {
-    console.log('Errors fetching data', err);
-    res.status(500).json({error: 'Failed to fetch books'})
+  } catch (err) {
+    console.error('Error fetching data', err);
+    res.status(500).json({ error: 'Failed to fetch books' });
   }
-}
+};
 
 export default { addBooksToFirestore, getAllBooks };
