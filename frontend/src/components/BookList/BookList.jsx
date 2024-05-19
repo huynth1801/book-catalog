@@ -1,5 +1,4 @@
-// src/components/BookList/BookList.js
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchBooks, recommendBook } from '../../redux/bookSlice';
 import BookCard from '../BookCard/BookCard';

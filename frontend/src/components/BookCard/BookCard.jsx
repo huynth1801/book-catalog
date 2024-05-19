@@ -1,5 +1,3 @@
-import React from 'react';
-
 const BookCard = ({ book }) => {
   return (
     <div className='bg-white shadow-lg rounded-lg p-6 mb-4 flex flex-col justify-between sm:w-full lg:max-w-md xl:max-w-lg'>
@@ -15,7 +13,7 @@ const BookCard = ({ book }) => {
         </div>
         <div className='flex text-gray-700 mb-4 items-center'>
           <p className='font-bold mr-4'>ISBN: </p>
-          <p>{book.ISBN ?? 'Unknown'}</p>
+          <p>{book.ISBN || 'Unknown'}</p>
         </div>
         <div className='flex text-gray-700 mb-4 items-center'>
           <p className='font-bold mr-4'>Rating: </p>
