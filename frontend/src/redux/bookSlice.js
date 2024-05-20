@@ -36,6 +36,11 @@ export const deleteBook  = createAsyncThunk('books/deleteBook', async(bookId) =>
     return bookId 
 })
 
+export const editBook = createAsyncThunk('books/editBook', async(updatedBook) => {
+    const response = await bookService.editBook(updatedBook?.id, updatedBook)
+    return response.data
+})
+
 const initialState = {
     books: [],
     status: 'idle',
@@ -78,6 +83,22 @@ const bookSlice = createSlice({
             state.books = state.books.filter(book => book.id !== action.payload);
         })
         .addCase(deleteBook.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.error.message;
+        })
+        // edit
+        .addCase(editBook.pending, (state) => {
+            state.status = 'loading';
+        })
+        .addCase(editBook.fulfilled, (state, action) => {
+            state.status = 'succeeded';
+            // Update the edited book in the list
+            const editedBookIndex = state.books.findIndex(book => book.id === action.payload.id);
+            if (editedBookIndex !== -1) {
+                state.books[editedBookIndex] = action.payload;
+            }
+        })
+        .addCase(editBook.rejected, (state, action) => {
             state.status = 'failed';
             state.error = action.error.message;
         });

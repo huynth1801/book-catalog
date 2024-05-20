@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { db, validate } from '../Firebase/firebase.js';
-import { ref, set, get, query, orderByChild, equalTo, remove } from 'firebase/database';
+import { ref, set, get, query, orderByChild, equalTo, remove, update } from 'firebase/database';
 import { v4 as uuidv4 } from 'uuid';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -160,6 +160,28 @@ const deleteBook = async(req, res) => {
   }
 };
 
+const editBook = async(req, res) => {
+  try {
+    const bookId = req.params?.id
+    const updatedBook = req.body
+    if(!bookId) {
+      console.log('Book ID is missing');
+      return res.status(400).json({ error: 'Book ID is required' });
+    }
 
+    const bookRef = ref(db, `books/${bookId}`);
+    const snapshot = await get(bookRef);
 
-export default { addBooksToFirestore, getAllBooks, addNewBook, deleteBook };
+    if(!snapshot.exists()) {
+      return res.status(404).json({ error: 'Book not found' });
+    }
+
+    await update(bookRef, updatedBook)
+    res.status(200).json(updatedBook)
+  } catch(err) {
+    console.error('Error editing book:', err)
+    throw err
+  }
+}
+
+export default { addBooksToFirestore, getAllBooks, addNewBook, deleteBook, editBook };

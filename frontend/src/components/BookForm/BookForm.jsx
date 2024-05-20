@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import Input from '../InputField/Input';
-import { addNewBook, recommendBook } from '../../redux/bookSlice';
+import { addNewBook, editBook } from '../../redux/bookSlice';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
+import Input from '../InputField/Input';
 
-const BookForm = ({ onSubmit, onClose }) => {
+const BookForm = ({ onSubmit, onClose, initialData }) => {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     name: '',
@@ -13,6 +13,12 @@ const BookForm = ({ onSubmit, onClose }) => {
     rating: 0,
     ISBN: ''
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,8 +37,14 @@ const BookForm = ({ onSubmit, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await dispatch(addNewBook(formData));
-    onSubmit();
+    if (initialData) {
+      // Edit book
+      await dispatch(editBook({ ...initialData, ...formData }));
+    } else {
+      // Add new book
+      await dispatch(addNewBook(formData));
+    }
+    onSubmit(formData);
     // Reset form data after submission
     setFormData({
       name: '',
@@ -43,52 +55,48 @@ const BookForm = ({ onSubmit, onClose }) => {
     });
   };
 
-  const handleClose = () => {
-    onClose();
-  };
-
   return (
-    <form onSubmit={handleSubmit} className='fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 '>
+    <form onSubmit={handleSubmit} className='fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75'>
       <div className='bg-white p-8 rounded-lg shadow-lg w-full max-w-lg relative'>
-        <button type='button' className='absolute top-2 right-2 text-red-500 hover:text-red-700' onClick={handleClose}>
+        <button type='button' className='absolute top-2 right-2 text-red-500 hover:text-red-700' onClick={onClose}>
           <IoMdCloseCircleOutline size={36} />
         </button>
-        <h1 className='text-xl mb-4 text-center'>Add New Book</h1>
+        <h1 className='text-xl mb-4 text-center'>{initialData ? 'Edit Book' : 'Add New Book'}</h1>
         <Input
           label='Name'
           type='text'
           name='name'
-          value={formData.name}
+          value={formData.name || ''}
           onChange={handleChange}
           maxLength={100}
-          placeHolder={'Please type a name of your book'}
+          placeholder='Please type the name of your book'
           required
         />
         <Input
           label='Authors (comma separated)'
           type='text'
           name='authors'
-          value={formData.authors}
-          placeHolder={'Please type name of the authors'}
+          value={formData.authors || ''}
           onChange={handleChange}
+          placeholder='Please type the names of the authors'
           required
         />
         <Input
           label='Publication Year'
           type='number'
           name='publicationYear'
-          value={formData.publicationYear}
-          placeHolder={'Publication year (optional)'}
+          value={formData.publicationYear || ''}
           onChange={handleChange}
+          placeholder='Publication year (optional)'
           min='1801'
         />
         <Input
           label='Rating'
           type='number'
           name='rating'
-          value={formData.rating}
+          value={formData.rating || ''}
           onChange={handleChange}
-          placeHolder={'Rating (optional, 0 by default)'}
+          placeholder='Rating (optional, 0 by default)'
           min='0'
           max='10'
         />
@@ -96,15 +104,15 @@ const BookForm = ({ onSubmit, onClose }) => {
           label='ISBN'
           type='text'
           name='ISBN'
-          value={formData.ISBN}
+          value={formData.ISBN || ''}
           onChange={handleChange}
-          placeHolder={'Optional'}
+          placeholder='Optional'
         />
         <button
           type='submit'
           className='bg-blue-500 text-white px-4 py-2 rounded items-center text-center w-full hover:bg-blue-600'
         >
-          Add Book
+          {initialData ? 'Edit Book' : 'Add Book'}
         </button>
       </div>
     </form>

@@ -7,5 +7,6 @@ router.post('/add-sample-data', bookController.addBooksToFirestore);
 router.get('/books', bookController.getAllBooks);
 router.post('/books', bookController.addNewBook)
 router.delete('/books/:id', bookController.deleteBook)
+router.put('/books/:id', bookController.editBook)
 
 export default router;

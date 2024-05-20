@@ -79,7 +79,7 @@ const BookList = () => {
           <BookCard key={recommendedBook.id} book={recommendedBook} />
         </div>
       )}
-      <h1 className='text-2xl font-bold m-4 text-center'>All Books</h1>
+      <h1 className='text-2xl font-bold m-4 text-center text-red-400'>All Books</h1>
       {status === 'loading' && <p>Loading...</p>}
       {status === 'failed' && <p>Error: {error}</p>}
       {status === 'succeeded' && books.length === 0 && <p>No books available</p>}

@@ -31,4 +31,14 @@ const deleteBook = async(bookId) => {
     }
 }
 
-export default {getAllBooks, addNewBook, deleteBook}
+const editBook = async(bookId, updatedBookData) => {
+    try {
+        const response = await axios.put(`${baseUrl}/books/${bookId}`, updatedBookData)
+        return response
+    } catch(err) {
+        console.error('Error editing book', err);
+        throw err;
+    }
+}
+
+export default {getAllBooks, addNewBook, deleteBook, editBook}
