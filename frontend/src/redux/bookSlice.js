@@ -26,6 +26,11 @@ export const recommendBook = createAsyncThunk('books/recommendBook', async (_, {
     return recommendedBook;
 });
 
+export const addNewBook = createAsyncThunk('books/addNewBook', async(newBookData) => {
+    const response = await bookService.addNewBook(newBookData);
+    return response
+})
+
 const initialState = {
     books: [],
     status: 'idle',
@@ -51,7 +56,18 @@ const bookSlice = createSlice({
         })
         .addCase(recommendBook.fulfilled, (state, action) => {
             state.recommendedBook = action.payload;
-          });
+        })
+        .addCase(addNewBook.pending, (state) => {
+            state.status = 'loading';
+        })
+        .addCase(addNewBook.fulfilled, (state, action) => {
+            state.status = 'succeeded';
+            state.books.push(action.payload);
+        })
+        .addCase(addNewBook.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.error.message;
+        });
     }
 });
 

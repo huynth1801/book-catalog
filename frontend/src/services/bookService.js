@@ -12,4 +12,14 @@ const getAllBooks = async() => {
     }
 }
 
-export default {getAllBooks}
+const addNewBook = async(newBookData) => {
+    try {
+        const response = await axios.post(`${baseUrl}/books`, newBookData);
+        return response.data;
+    } catch(err) {
+        console.error('Error adding new book', err)
+        throw err;
+    }
+}
+
+export default {getAllBooks, addNewBook}

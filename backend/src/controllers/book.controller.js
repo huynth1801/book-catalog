@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { db, validate } from '../Firebase/firebase.js';
-import { ref, set, get, query, orderByChild, equalTo, push } from 'firebase/database';
+import { ref, set, get, query, orderByChild, equalTo, remove } from 'firebase/database';
 import { v4 as uuidv4 } from 'uuid';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -93,7 +93,7 @@ const addNewBook = async (req, res) => {
       return res.status(400).json({ error: 'Publication year should be greater than 1800' });
     }
 
-    if (rating && (rating < 0 || rating > 10 || !Number.isInteger(rating))) {
+    if (rating && (rating < 0 || rating > 10 )) {
       return res.status(400).json({ error: 'Rating should be an integer value from 0 to 10' });
     }
 
@@ -112,8 +112,17 @@ const addNewBook = async (req, res) => {
         rating: rating || 0,
         ISBN: ISBN || null
       });
+
+      const newBook = {
+        name: name,
+        authors: authors,
+        publicationYear: publicationYear,
+        rating: rating || 0,
+        ISBN: ISBN || null,
+        id: newBookId
+      }
       
-      res.status(201).json({ message: 'New book added successfully', id: newBookId });
+      res.status(201).json( newBook );
     } else {
       // Book already exists
       res.status(400).json({ error: 'A book with the same name already exists' });
@@ -124,5 +133,17 @@ const addNewBook = async (req, res) => {
   }
 };
 
+// Delete book with id
+const deleteBook = async(req, res) => {
+  try {
+    const bookId = req.params?.id
+    await remove(ref(db, `books/${bookId}`))
+    res.status(204).send({message: 'Delete book successfully'});
+  } catch(err) {
+    console.error('Error deleting books', err)
+    res.status(500).json({ error: 'Failed to delete the book' });
+  }
+}
 
-export default { addBooksToFirestore, getAllBooks, addNewBook };
+
+export default { addBooksToFirestore, getAllBooks, addNewBook, deleteBook };
