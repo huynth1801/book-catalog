@@ -3,9 +3,11 @@ import { useDispatch } from 'react-redux';
 import { addNewBook, editBook } from '../../redux/bookSlice';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import Input from '../InputField/Input';
+import checkValidation from '../../helpers/validationisbn';
 
 const BookForm = ({ onSubmit, onClose, initialData }) => {
   const dispatch = useDispatch();
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     name: '',
     authors: '',
@@ -35,8 +37,22 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
     }));
   };
 
+  const validateForm = () => {
+    const errors = {};
+    if (!formData?.ISBN) {
+      return true;
+    } else if (formData?.ISBN?.trim() !== '' && !checkValidation.isValidISBN(formData.ISBN)) {
+      errors.ISBN = 'Invalid ISBN';
+    }
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
     if (initialData) {
       // Edit book
       await dispatch(editBook({ ...initialData, ...formData }));
@@ -61,9 +77,10 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
         <button type='button' className='absolute top-2 right-2 text-red-500 hover:text-red-700' onClick={onClose}>
           <IoMdCloseCircleOutline size={36} />
         </button>
-        <h1 className='text-xl mb-4 text-center'>{initialData ? 'Edit Book' : 'Add New Book'}</h1>
+        <h1 className={'text-xl mb-4 text-center'}>{initialData ? 'Edit Book' : 'Add New Book'}</h1>
         <Input
           label='Name'
+          inputType='textarea'
           type='text'
           name='name'
           value={formData.name || ''}
@@ -89,6 +106,7 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
           onChange={handleChange}
           placeholder='Publication year (optional)'
           min='1801'
+          max='2024'
         />
         <Input
           label='Rating'
@@ -108,6 +126,7 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
           onChange={handleChange}
           placeholder='Optional'
         />
+        {errors.ISBN && <p className='text-red-500 mb-[12px]'>{errors.ISBN}</p>}
         <button
           type='submit'
           className='bg-blue-500 text-white px-4 py-2 rounded items-center text-center w-full hover:bg-blue-600'
