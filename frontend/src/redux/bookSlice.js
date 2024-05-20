@@ -31,6 +31,11 @@ export const addNewBook = createAsyncThunk('books/addNewBook', async(newBookData
     return response
 })
 
+export const deleteBook  = createAsyncThunk('books/deleteBook', async(bookId) => {
+    await bookService.deleteBook(bookId)
+    return bookId 
+})
+
 const initialState = {
     books: [],
     status: 'idle',
@@ -65,6 +70,14 @@ const bookSlice = createSlice({
             state.books.push(action.payload);
         })
         .addCase(addNewBook.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.error.message;
+        })
+        .addCase(deleteBook.fulfilled, (state, action) => {
+            state.status = 'succeeded';
+            state.books = state.books.filter(book => book.id !== action.payload);
+        })
+        .addCase(deleteBook.rejected, (state, action) => {
             state.status = 'failed';
             state.error = action.error.message;
         });

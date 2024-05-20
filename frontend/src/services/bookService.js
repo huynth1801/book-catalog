@@ -22,4 +22,13 @@ const addNewBook = async(newBookData) => {
     }
 }
 
-export default {getAllBooks, addNewBook}
+const deleteBook = async(bookId) => {
+    try {
+        await axios.delete(`${baseUrl}/books/${bookId}`)
+    } catch(err) {
+        console.error('Error deleting book', err)
+        throw err;
+    }
+}
+
+export default {getAllBooks, addNewBook, deleteBook}
