@@ -86,7 +86,7 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
           value={formData.name || ''}
           onChange={handleChange}
           maxLength={100}
-          placeholder='Please type the name of your book'
+          placeHolder='Please type the name of your book'
           required
         />
         <Input
@@ -95,7 +95,7 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
           name='authors'
           value={formData.authors || ''}
           onChange={handleChange}
-          placeholder='Please type the names of the authors'
+          placeHolder='Please type the names of the authors'
           required
         />
         <Input
@@ -104,7 +104,7 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
           name='publicationYear'
           value={formData.publicationYear || ''}
           onChange={handleChange}
-          placeholder='Publication year (optional)'
+          placeHolder='Publication year (optional)'
           min='1801'
           max={import.meta.env.VITE_MAXIMUM_PUBLICATION_YEAR}
         />
@@ -114,7 +114,7 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
           name='rating'
           value={formData.rating || ''}
           onChange={handleChange}
-          placeholder='Rating (optional, 0 by default)'
+          placeHolder='Rating (optional, 0 by default)'
           min='0'
           max='10'
         />
@@ -124,7 +124,7 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
           name='ISBN'
           value={formData.ISBN || ''}
           onChange={handleChange}
-          placeholder='Optional'
+          placeHolder='Optional'
         />
         {errors.ISBN && <p className='text-red-500 mb-[12px]'>{errors.ISBN}</p>}
         <button

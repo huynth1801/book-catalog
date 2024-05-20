@@ -28,7 +28,7 @@ const Input = ({ label, inputType, type, name, value, placeHolder, onChange, req
             required={required}
             min={min}
             max={max}
-            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${getBorderClass()}`}
+            className={`shadow appearance-none items-center border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${getBorderClass()}`}
           />
         ) : (
           <input
