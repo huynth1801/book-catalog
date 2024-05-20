@@ -48,17 +48,17 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateForm()) {
       return;
     }
     if (initialData) {
       // Edit book
-      await dispatch(editBook({ ...initialData, ...formData }));
+      dispatch(editBook({ ...initialData, ...formData }));
     } else {
       // Add new book
-      await dispatch(addNewBook(formData));
+      dispatch(addNewBook(formData));
     }
     onSubmit(formData);
     // Reset form data after submission
@@ -106,7 +106,7 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
           onChange={handleChange}
           placeholder='Publication year (optional)'
           min='1801'
-          max='2024'
+          max={import.meta.env.VITE_MAXIMUM_PUBLICATION_YEAR}
         />
         <Input
           label='Rating'

@@ -18,10 +18,10 @@ const BookCard = ({ book }) => {
     setShowEditForm(true);
   };
 
-  const handleEditBookFormSubmit = async (updatedBook) => {
+  const handleEditBookFormSubmit = (updatedBook) => {
     setShowEditForm(false);
-    await dispatch(editBook(updatedBook));
-    dispatch(fetchBooks());
+    dispatch(editBook(updatedBook));
+    // dispatch(fetchBooks());
   };
 
   return (
