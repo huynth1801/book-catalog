@@ -1,5 +1,24 @@
 # Book Catalog Website
 
+## Introduction to the Backend API
+
+My Backend API uses Render's free tier service for hosting. An important note when using free tier plans is that the servers will automatically go into "sleep" mode after about 30 minutes of inactivity. When a new request comes in, the server will "wake up," and this process can take approximately 30 seconds.
+
+My website is deployed and can be accessed at [https://book-catalog-psi.vercel.app/](https://book-catalog-psi.vercel.app/).
+
+### Benefits and Limitations of the Free Tier
+
+- **Benefits**:
+
+  - Cost-effective hosting solution.
+  - Suitable for small projects or testing purposes.
+
+- **Limitations**:
+  - Initial response time might be slow due to the server needing time to wake up after sleeping.
+  - Not suitable for applications that require immediate and continuous response times.
+
+We hope you have
+
 ## Features
 
 1. **Store Data Using Firestore and Firestore SDK**
@@ -58,6 +77,28 @@ Change your configure Firebase to **_.env_**
 ```bash
 npm start
 ```
+
+## APIs
+
+### Get all books
+
+- GET `api/v1/books`
+
+### Post a new book
+
+- POST `api/v1/books`
+
+### Post sample data
+
+- POST `api/v1/add-sample-data`
+
+### Edit a book
+
+- PUT `api/v1/books/:id`
+
+### Delete a book
+
+- DELETE `api/v1/books/:id`
 
 ## Set up Frontend
 
