@@ -4,6 +4,7 @@ import { addNewBook, fetchBooks, recommendBook } from '../../redux/bookSlice';
 import { MdAddCircleOutline } from 'react-icons/md';
 import BookCard from '../BookCard/BookCard';
 import BookForm from '../BookForm/BookForm';
+import Notification from '../Notification/Notification';
 
 const BookList = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,7 @@ const BookList = () => {
   const [showAddButton, setShowAddButton] = useState(true);
   const [showBookForm, setShowBookForm] = useState(false);
   const [groupingCriteria, setGroupingCriteria] = useState('publicationYear');
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -61,6 +63,7 @@ const BookList = () => {
 
   const handleBookFormSubmit = () => {
     setShowBookForm(false);
+    setNotification('Book added successfully!');
   };
 
   const handleCloseForm = () => {
@@ -73,6 +76,7 @@ const BookList = () => {
 
   return (
     <div className='container mx-auto px-4'>
+      {notification && <Notification message={notification} onClose={() => setNotification(null)} />}
       {recommendedBook && (
         <div className='mb-6'>
           <h1 className='text-2xl font-bold mb-4 text-center text-red-400'>Recommended Book</h1>
