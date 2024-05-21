@@ -33,11 +33,23 @@ const BookList = () => {
   const groupBooks = (books, criteria) => {
     const groupedBooks = {};
     books.forEach((book) => {
-      const key = book[criteria] || `Books without ${criteria}`;
-      if (!groupedBooks[key]) {
-        groupedBooks[key] = [];
+      let keys = [];
+      if (criteria === 'authors') {
+        keys = Array.isArray(book.authors)
+          ? book.authors.flatMap((author) => author.split(',').map((name) => name.trim()))
+          : book.authors.split(',').map((name) => name.trim());
+      } else {
+        keys = [
+          Array.isArray(book[criteria]) ? book[criteria].join(', ') : book[criteria] || `Books without ${criteria}`
+        ];
       }
-      groupedBooks[key].push(book);
+
+      keys.forEach((key) => {
+        if (!groupedBooks[key]) {
+          groupedBooks[key] = [];
+        }
+        groupedBooks[key].push(book);
+      });
     });
 
     const sortedGroups = Object.keys(groupedBooks)
@@ -122,7 +134,7 @@ const BookList = () => {
           <MdAddCircleOutline className='text-2xl' />
         </button>
       )}
-      {showBookForm && <BookForm onSubmit={handleBookFormSubmit} onClose={handleCloseForm} />}
+      {showBookForm && <BookForm onSubmit={handleBookFormSubmit} onClose={handleCloseForm} books={books} />}
     </div>
   );
 };

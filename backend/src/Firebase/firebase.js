@@ -23,7 +23,7 @@ const validate = (book) => {
   if (!book.name || book.name.length > 100) {
     return false;
   }
-  if (!book.authors || typeof book.authors !== 'string' || book.authors.trim() === '') {
+  if (!Array.isArray(book.authors) || book.authors.length === 0) {
     return false;
   }
   if (book.publicationYear && book.publicationYear <= 1800) {

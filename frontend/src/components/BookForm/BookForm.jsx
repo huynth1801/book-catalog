@@ -4,19 +4,37 @@ import { addNewBook, editBook } from '../../redux/bookSlice';
 import { IoMdCloseCircleOutline } from 'react-icons/io';
 import Input from '../InputField/Input';
 import checkValidation from '../../helpers/validationisbn';
-import Notification from '../Notification/Notification';
+import CreatableSelect from 'react-select/creatable';
 
-const BookForm = ({ onSubmit, onClose, initialData }) => {
+const BookForm = ({ onSubmit, onClose, initialData, books }) => {
   const dispatch = useDispatch();
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     name: '',
-    authors: '',
+    authors: [],
     publicationYear: '',
     rating: 0,
     ISBN: ''
   });
-  const [notification, setNotification] = useState(null);
+
+  const processAuthors = (books) => {
+    if (!Array.isArray(books)) {
+      throw new Error('books should be an array');
+    }
+    const allAuthors = books.flatMap((book) =>
+      Array.isArray(book.authors)
+        ? book.authors.flatMap((author) => author.split(',').map((name) => name.trim()))
+        : book.authors.split(',').map((name) => name.trim())
+    );
+    return [...new Set(allAuthors)].map((author) => ({ label: author, value: author }));
+  };
+
+  let allAuthors = [];
+  try {
+    allAuthors = processAuthors(books);
+  } catch (error) {
+    console.error(error.message);
+  }
 
   useEffect(() => {
     if (initialData) {
@@ -36,6 +54,13 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: numericValue
+    }));
+  };
+
+  const handleAuthorsChange = (selectedAuthors) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      authors: selectedAuthors.map((author) => author.value)
     }));
   };
 
@@ -60,11 +85,10 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
     } else {
       dispatch(addNewBook(formData));
     }
-    setNotification('Book added successfully!');
     onSubmit(formData);
     setFormData({
       name: '',
-      authors: '',
+      authors: [],
       publicationYear: '',
       rating: 0,
       ISBN: ''
@@ -93,15 +117,17 @@ const BookForm = ({ onSubmit, onClose, initialData }) => {
             placeHolder='Please type the name of your book'
             required
           />
-          <Input
-            label='Authors (comma separated)'
-            type='text'
-            name='authors'
-            value={formData.authors || ''}
-            onChange={handleChange}
-            placeHolder='Please type the names of the authors'
-            required
-          />
+          <div className='mb-4'>
+            <label className='block text-gray-700 text-sm font-bold mb-2'>Authors (select multiple)</label>
+            <CreatableSelect
+              isMulti
+              value={formData.authors.map((name) => ({ label: name, value: name }))}
+              onChange={handleAuthorsChange}
+              options={allAuthors}
+              placeholder='Select or create authors'
+              className='w-full border-2 border-solid'
+            />
+          </div>
           <Input
             label='Publication Year'
             type='number'

@@ -1,10 +1,11 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { deleteBook, fetchBooks, editBook } from '../../redux/bookSlice';
 import { useState } from 'react';
 import BookForm from '../BookForm/BookForm';
 
 const BookCard = ({ book }) => {
   const dispatch = useDispatch();
+  const books = useSelector((state) => state.books.books);
 
   const [showEditForm, setShowEditForm] = useState(false);
   const [initialData, setInitialData] = useState(null);
@@ -30,7 +31,7 @@ const BookCard = ({ book }) => {
         <h2 className='text-xl font-semibold mb-2'>{book.name}</h2>
         <div className='flex text-gray-700 mb-4 items-center'>
           <p className='font-bold mr-4'>Authors: </p>
-          <p>{book?.authors}</p>
+          <p>{book?.authors.join(', ')}</p>
         </div>
         <div className='flex text-gray-700 mb-4 items-center'>
           <p className='font-bold mr-4'>Publication Year: </p>
@@ -61,6 +62,7 @@ const BookCard = ({ book }) => {
           onClose={() => setShowEditForm(false)}
           initialData={initialData}
           onSubmit={handleEditBookFormSubmit}
+          books={books}
         />
       )}
     </div>
