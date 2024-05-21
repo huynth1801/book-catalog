@@ -17,8 +17,6 @@ My website is deployed and can be accessed at [https://book-catalog-psi.vercel.a
   - Initial response time might be slow due to the server needing time to wake up after sleeping.
   - Not suitable for applications that require immediate and continuous response times.
 
-We hope you have
-
 ## Features
 
 1. **Store Data Using Firestore and Firestore SDK**
