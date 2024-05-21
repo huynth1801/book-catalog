@@ -57,6 +57,9 @@ const BookList = () => {
         if (criteria === 'publicationYear') {
           return b - a;
         }
+        if (criteria === 'rating') {
+          return parseFloat(b) - parseFloat(a); // Convert to number and sort in descending order
+        }
         return a.localeCompare(b);
       })
       .map((key) => ({
