@@ -126,6 +126,7 @@ const BookForm = ({ onSubmit, onClose, initialData, books }) => {
               options={allAuthors}
               placeholder='Select or create authors'
               className='w-full border-2 border-solid'
+              required
             />
           </div>
           <Input
